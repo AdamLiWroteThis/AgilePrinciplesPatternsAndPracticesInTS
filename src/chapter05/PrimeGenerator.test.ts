@@ -17,3 +17,17 @@ test("TestPrimes", () => {
   expect(centArray.length).toBe(25);
   expect(centArray[24]).toBe(97);
 });
+
+test("Test Exhaustive", () => {
+  for (let i = 2; i < 50; i++) {
+    VerifyPrimeList(PrimeGenerator.GeneratePrimeNumbers(i));
+  }
+});
+
+function VerifyPrimeList(list: number[]): void {
+  for (let i = 0; i < list.length; i++) VerifyPrime(list[i]);
+}
+
+function VerifyPrime(n: number): void {
+  for (let factor = 2; factor < n; factor++) expect(n % factor).not.toBe(0);
+}

@@ -1,48 +1,49 @@
 class PrimeGenerator {
-  private static s: number;
-  private static f: boolean[];
-  private static primes: number[];
+  private static crossedOut: boolean[];
+  private static result: number[];
 
   public static GeneratePrimeNumbers(maxValue: number): number[] {
     if (maxValue < 2) return new Array<number>(0);
     else {
-      this.InitializeSieve(maxValue);
-      this.Sieve();
-      this.LoadPrimes();
-
-      return this.primes;
+      this.UnCrossIntegersUpTo(maxValue);
+      this.CrossOutMultiples();
+      this.PutUncrossedIntersIntoResult();
+      return this.result;
     }
   }
-  private static LoadPrimes(): void {
-    let i;
-    let j;
+  private static UnCrossIntegersUpTo(maxValue: number): void {
+    this.crossedOut = new Array<boolean>(maxValue + 1);
+    for (let i = 2; i < this.crossedOut.length; i++) this.crossedOut[i] = false;
+  }
+  private static PutUncrossedIntersIntoResult(): void {
+    this.result = new Array<number>(this.NumberOfUncrossedInters());
+    for (let j = 0, i = 2; i < this.crossedOut.length; i++) {
+      if (this.NotCrossed(i)) this.result[j++] = i;
+    }
+  }
+  private static NumberOfUncrossedInters(): number {
     let count: number = 0;
-    for (i = 0; i < this.s; i++) {
-      if (this.f[i]) count++;
+    for (let i = 2; i < this.crossedOut.length; i++) {
+      if (this.NotCrossed(i)) count++;
     }
-
-    this.primes = new Array<number>(count);
-    for (i = 0, j = 0; i < this.s; i++) {
-      if (this.f[i]) this.primes[j++] = i;
+    return count;
+  }
+  private static CrossOutMultiples(): void {
+    let maxPrimeFactor: number = this.DetermineIterationLimit();
+    for (let i = 2; i < maxPrimeFactor + 1; i++) {
+      if (this.NotCrossed(i)) this.CrossOutputMultiplesOf(i);
     }
   }
-  private static InitializeSieve(maxValue: number): void {
-    this.s = maxValue + 1;
-    this.f = new Array<boolean>(this.s);
-    let i;
-
-    for (i = 0; i < this.s; i++) this.f[i] = true;
-
-    this.f[0] = this.f[1] = false;
+  private static DetermineIterationLimit(): number {
+    let maxPrimeFactor: number = Math.sqrt(this.crossedOut.length) + 1;
+    return maxPrimeFactor;
   }
-  private static Sieve(): void {
-    let i;
-    let j;
-    for (i = 2; i < Math.sqrt(this.s) + 1; i++) {
-      if (this.f[i]) {
-        for (j = 2 * i; j < this.s; j += i) this.f[j] = false;
-      }
-    }
+  private static CrossOutputMultiplesOf(i: number): void {
+    for (let multiple = 2 * i; multiple < this.crossedOut.length; multiple += i)
+      this.crossedOut[multiple] = true;
+  }
+  private static NotCrossed(i: number): boolean {
+    return this.crossedOut[i] === false;
   }
 }
 
